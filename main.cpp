@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdlib.h>
 
 using namespace  std;
 
@@ -10,13 +11,13 @@ struct n {
 int main() {
 
     // инициализцаия
-    n *one = NULL;
+    /*n *one = NULL;
     n *t = NULL;
     t = new (n);
     (*t).d = 108;
-
-    //вставка 2 элемента
     one = t;
+
+    //вставка 2 элемента в начало
     t = new (n);
     (*t).next = NULL;
     (*t).d = 530;
@@ -38,34 +39,43 @@ int main() {
         cout << "Адрес числа " << (*tVsvod).d << "=" << &(*tVsvod).d <<
             ", адрес след элемента - " << (*tVsvod).next << endl;
     }
-    cout << endl;
+    cout << endl;*/
 
-    /*int amount;
-    cout << "enter amount";
+    int amount;
+    cout << "Введите кол-о элементов: ";
     cin >> amount;
 
     n *one = NULL;
     n *t = NULL;
     t = new (n);
+    one = t;
 
     for (int i = 0; i < amount; i++) {
-        (*t).d = rand()%100;
-
-        (*t).next = one;
-        one=t;
-        (*t).next = NULL;
+        
+        n *t2;
+        t2 = one;
+        while ((*t2).next != NULL) t2 = (*t2).next;
+        t = new (n);
+        t->next = NULL;
+        (*t).d = rand() % 100;
+        (*t2).next = t;
     }
 
-    n *tVsvod;
-    for (tVsvod = one; tVsvod != NULL; tVsvod = (*tVsvod).next) {
-        cout << "Адрес числа " << (*tVsvod).d << "=" << &(*tVsvod).d <<
-            ", адрес след элемента - " << (*tVsvod).next << endl;
-    }*/
+    n *tVyvod;
+    for (tVyvod = one; tVyvod != NULL; tVyvod = (*tVyvod).next) {
+        cout << "Адрес числа " << (*tVyvod).d << "=" << &(*tVyvod).d <<
+            ", адрес след элемента - " << (*tVyvod).next << endl;
+    }
 
     return 0;
 }
 
 /*
-Адрес числа 530=0x105289a60, адрес след элемента - 0x105289a50
-Адрес числа 108=0x105289a50, адрес след элемента - 0x0
+Введите кол-о элементов: 5
+Адрес числа 0=0x563138d75b40, адрес след элемента - 0x563138d75b60
+Адрес числа 83=0x563138d75b60, адрес след элемента - 0x563138d75b80
+Адрес числа 86=0x563138d75b80, адрес след элемента - 0x563138d75ba0
+Адрес числа 77=0x563138d75ba0, адрес след элемента - 0x563138d75bc0
+Адрес числа 15=0x563138d75bc0, адрес след элемента - 0x563138d75be0
+Адрес числа 93=0x563138d75be0, адрес след элемента - 0
  */
