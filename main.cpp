@@ -1,136 +1,170 @@
-//Лыков БАС2
 #include <iostream>
-
 using namespace std;
 
-struct node {
-    int di;
-    double dd;
-    node *next;
+struct R {
+    double d;
+    R *next;
 };
 
-void outp(node* head) {
-    node *tv;
-    for (tv = head; tv != NULL; tv = tv->next) {
-        cout << (*tv).di << ", " << (*tv).dd << " - " << &(*tv).di << " " << &(*tv).dd << endl;
-    }
+struct Y {
+    int d;
+    Y *next;
+};
+
+struct U {
+    double dS;
+    int dQ;
+    U *next;
+};
+
+R* initStek(R* origin) {
+    origin = new R;
+    (*origin).d = (rand() % 100) * 0.1;
+    cout << (*origin).d << endl;
+    (*origin).next = NULL;
+    return origin;
 }
 
-node* zap(node *one, node *head) {
-    one = NULL;
-    node *t2 = NULL;
-    for (int i = 0; i < (*head).di; i++) {
-        node *t = new node;
-        (*t).di = rand() % 100;
-        (*t).dd = (rand() % 100) / 100.0;
-        t->next = NULL;
-        if (one == NULL) {
-            one = t;
-            t2 = t;
-            (*head).next = one;
+R* zapStek(R* st, int NR) {
+    for (int i = 1; i < NR; i++) {
+        R *p;
+        p = new R;
+        (*p).d = (rand() % 100) * 0.1;
+        cout << (*p).d << endl;
+        (*p).next = st;
+        st = p;
+    }
+    return st;
+}
+
+void outpStek(R* st) {
+    R* current = st;
+    while (current != NULL) {
+        cout << (*current).d << " ";
+        current = (*current).next;
+    }
+    cout << endl;
+}
+
+Y* zapQueue(Y* yo, Y *zo, int NY) {
+    for (int i = 0; i < NY; i++) {
+        Y *t;
+        t = new (Y);
+        (*t).d = rand() % 100;
+        if (zo == NULL) {
+            zo = t;
+            yo = t;
         } else {
-            (*t2).next = t;
-            t2 = t;
+            (*zo).next = t;
+            zo = t;
         }
     }
+    return yo;
+}
 
-    cout << "Заполненный список:\n";
-    outp(head);
+void outpQueue(Y* yo) {
+    while (yo != NULL) {
+        cout << (*yo).d << " ";
+        yo = (*yo).next;
+    }
+}
 
-    double sum = 0.0;
-    node *cur = one;
-    node *last = NULL;
+void outpU(U* u) {
+    U* cur = u;
     while (cur != NULL) {
-        sum += ((*cur).dd + (*cur).di);
-        last = cur;
+        cout << "(" << (*cur).dS << ", " << (*cur).dQ << ") ";
         cur = (*cur).next;
     }
-    if (last != NULL) {
-        (*head).di = sum;//сумма в первое поле заглавного (di)
-        (*head).dd = (*last).dd;//вещественное поле последнего элемента
-    }
-    return one;
+    cout << endl;
 }
 
-node* deleteSeven(node *one, node *head) {
-    if (one == NULL) return NULL;
+U* zapU(R* &st, Y* &yo) { // Передаем по ссылке, чтобы обнулить оригиналы
+    U *u = NULL;
+    U *currentU = NULL;
 
-    for (int i = 0; i < 7; i++) {
-        if (one == NULL) break;
-        node *temp = one;
-        one = one->next;
+    // Заполнение из стека R
+    while (st != NULL) {
+        U *newU = new U;
+        (*newU).dS = (*st).d;  // Берем значение из стека
+        (*newU).dQ = 0;         // Для элементов из стека dQ = 0
+        (*newU).next = NULL;
+
+        if (u == NULL) {
+            u = newU;
+            currentU = u;
+        } else {
+            (*currentU).next = newU;
+            currentU = newU;
+        }
+
+        // Удаляем элемент из стека
+        R *temp = st;
+        st = (*st).next;
         delete temp;
     }
-    (*head).next = one;
-    return one;
-}
 
+    // Заполнение из очереди Y
+    while (yo != NULL) {
+        U *newU = new U;
+        (*newU).dS = 0;          // Для элементов из очереди dS = 0
+        (*newU).dQ = (*yo).d;     // Берем значение из очереди
+        (*newU).next = NULL;
+
+        if (u == NULL) {
+            u = newU;
+            currentU = u;
+        } else {
+            (*currentU).next = newU;
+            currentU = newU;
+        }
+
+        // Удаляем элемент из очереди
+        Y *temp = yo;
+        yo = (*yo).next;
+        delete temp;
+    }
+
+    return u;
+}
 int main() {
     srand(time(NULL));
 
-    int k;
-    cout << "Введите кол-о элементов списка: ";
-    cin >> k;
+    int NR, NY;
+    cout << "Введите кол-о элементов стека: R: ";
+    cin >> NR;
 
-    node *head = new node;
-    (*head).next = NULL;
-    (*head).di = k;
-    (*head).dd = 0.0;
+    //инициализация стека R
+    R *st;
+    st = NULL; //вершина стека
+    st = initStek(st);
 
-    node *one = NULL;
-    one = zap(one, head);
+    //заполнение стека R и его вывод
+    st = zapStek(st, NR);
+    cout << "стек R: ";
+    outpStek(st);
 
-    cout << "\nЗаглавный элемент:\n";
-    cout << "Сумма значений полей " << (*head).di << endl;
-    cout << "значение последнего элемента последнего элемента: " << (*head).dd << endl;
+    cout << "Введите кол-о элементов очереди Y: ";
+    cin >> NY;
 
-    cout << "список через с изменённым заглавным:\n";
-    outp(head);
+    //инициализация очереди Y
+    Y *yo;//начало очереди
+    Y *zo;//конец очереди
+    yo = NULL;
+    zo = NULL;
 
-    one = deleteSeven(one, head);
-    cout << "список после удаления 7 элементов:\n";
-    outp(head);
+    //заполнение очереди
+    yo = zapQueue(yo, zo, NY);
+    //вывод очереди Y
+    cout << "Очередь Y: ";
+    outpQueue(yo);
+    cout << endl;
+
+    //создание списка U
+    U *u;
+    u = NULL;
+    u = zapU(st, yo);
+    cout << "Список U: ";
+    outpU(u);
 
     return 0;
 }
-
-/*
- ТЕСТ
-Введите кол-о элементов списка: 10
-Заполненный список:
-10, 0 - 0xc2d000a00 0xc2d000a08
-22, 0.22 - 0x105525970 0x105525978
-70, 0.06 - 0x105525990 0x105525998
-38, 0.64 - 0x105525800 0x105525808
-24, 0.21 - 0x105525820 0x105525828
-94, 0.96 - 0x105525840 0x105525848
-22, 0.86 - 0x105525860 0x105525868
-40, 0.24 - 0x105525880 0x105525888
-24, 0.28 - 0x1055258a0 0x1055258a8
-1, 0.01 - 0x1055258c0 0x1055258c8
-29, 0.72 - 0x1055258e0 0x1055258e8
-
-Заглавный элемент:
-Сумма значений полей 368
-значение последнего элемента последнего элемента: 0.72
-список через с изменённым заглавным:
-368, 0.72 - 0xc2d000a00 0xc2d000a08
-22, 0.22 - 0x105525970 0x105525978
-70, 0.06 - 0x105525990 0x105525998
-38, 0.64 - 0x105525800 0x105525808
-24, 0.21 - 0x105525820 0x105525828
-94, 0.96 - 0x105525840 0x105525848
-22, 0.86 - 0x105525860 0x105525868
-40, 0.24 - 0x105525880 0x105525888
-24, 0.28 - 0x1055258a0 0x1055258a8
-1, 0.01 - 0x1055258c0 0x1055258c8
-29, 0.72 - 0x1055258e0 0x1055258e8
-список после удаления 7 элементов:
-368, 0.72 - 0xc2d000a00 0xc2d000a08
-24, 0.28 - 0x1055258a0 0x1055258a8
-1, 0.01 - 0x1055258c0 0x1055258c8
-29, 0.72 - 0x1055258e0 0x1055258e8
-
-Process finished with exit code 0
-
- */
