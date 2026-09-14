@@ -10,8 +10,8 @@ procedure add(var head1: Polynom; var head2: Polynom);
 var
     p1, p2, prev, vspom: Polynom;
 begin
-    p1 := head1^.next; //первый элемент 1 многочлена
-    p2 := head2^.next; // первый второго многочлена
+    p1 := head1^.next; //первый элемент 1 многочлена, до него фиктивный узел
+    p2 := head2^.next; // первый второго многочлена, до него фиктивный узел
     prev := head1; //хранит предыдущий относительно p1
 
     while (p2^.coef <> 0) or (p2^.step <> 0) do

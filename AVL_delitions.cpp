@@ -85,7 +85,7 @@ tree *deletion(tree *root, int x){
                     else prev->right = cur_potomok;
                 delete(cur);
             }
-            //удал. эл. имеет 2 и более потомка
+            //удал. эл. имеет 2 потомка
             else {
                 tree *cur_potomok, *mini;
                 if (cur->left != NULL) {
