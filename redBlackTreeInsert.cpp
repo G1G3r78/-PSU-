@@ -2,44 +2,6 @@
 
 using namespace std;
 
-typedef enum Color {RED, BLACK};
-
-struct node {
-    int d;
-    Color color;
-    node *left, *right, *parent;
-};
-
-node *createNode(int d){
-    node *n = new node;
-    (*n).d = d;
-    (*n).left = (*n).right = (*n).parent = NULL;
-    (*n).color = RED;
-    return n;
-}
-
-void rotateLeft();
-
-void rotateRight();
-
-node *insert(int x, node *tr){
-    if (tr == NULL) {
-        tr = createNode(x);
-        return tr;
-    }
-
-    if (x < (*tr).d) {
-        (*tr).left = insert(x, (*tr).left);
-        (*(*tr).left).parent = tr;
-    } else if (x > (*tr).d) {
-        (*tr).right = insert(x, (*tr).right);
-        (*(*tr).right).parent = tr;
-        } else {
-            cout << "уже есть в дереве\n";
-        }
-    return tr;
-}
-
 /*
 лист и корень чёрные
 у красного узла до 2 чёрных потомков
@@ -47,70 +9,110 @@ node *insert(int x, node *tr){
 */
 
 
+typedef enum Color {RED, BLACK};
+
 struct tree {
     int d;
-    bool isRed;
     tree *parent;
+    Color color;
     tree *left;
     tree *right;
 };
 
-void rotateLeft(tree *tr){}
-
-void rotateRight(tree *tr){}
-
-tree *searchInsert(tree *root, int x){
+//рекурсивная версия с red-black деревом не подходит
+/*tree *insert(int x, tree *root){
     if (root == NULL) {
-        tree *tr = new tree;
-        (*tr).parent = (*tr).left = (*tr).right = NULL;
-        (*tr).isRed = true;
-        (*tr).d = x;
-        return tr;
+        tree *node = new tree;
+        (*node).d = x;
+        (*node).parent = (*node).left = (*node).right = NULL;
+        (*node).color = RED;
+        return node;
     } else {
-        //простая вставка
         if (x < (*root).d) {
-            (*root).left = searchInsert((*root).left, x);
+            (*root).left = insertBST(x, (*root).left);
             (*(*root).left).parent = root;
-        } else if (x > (*root).d) {
-            (*root).right = searchInsert((*root).right, x);
+        }
+        else if (x > (*root).d) {
+            (*root).right = insertBST(x, (*root).right);
             (*(*root).right).parent = root;
-        } else cout <<"есть - нет вставки\n";
-        return root;
+        }
+        else cout << "нет вставки, уже есть\n";
     }
+    return root;
+}*/
+
+tree *rotateLeft(tree *root){};
+tree *rotateRight(tree *root){};
+
+tree *insert(int x, tree *root){
+
+    tree *prev, *cur;
+    prev = NULL;
+    cur = root;
+
+    while (cur != NULL && x != (*cur).d) {
+        prev = cur;
+        if (x < cur->d) cur = cur->left;
+            else cur = cur->right;
+    }
+
+    tree *node = new tree;
+    (*node).d = x;
+    (*node).left = (*node).right = NULL;
+    (*node).color = RED;
+    (*node).parent = prev;
+
+    if (prev == NULL) root = node;
+        else if (x < prev->d) prev->left = node;
+            else prev->right = node;
+
+    return fixInsert(node);
 }
 
-void fixInsert(tree *root){
-    tree *s, *p, *u, *g;
 
-    s = root;
-    p = (*s).parent;
-    g = (*p).parent;
-    if (p == (*g).left) u = (*g).right;
-        else u = (*g).left;
+tree *fixInsert(tree *root){
+    tree *x, *p, *u, *g;
 
-    //проверки на балансировку
-    if ((*u).isRed == true) {
-        (*p).isRed = false;
-        (*u).isRed = false;
-        if ((*g).parent == NULL) (*g).isRed = false;
-            else (*g).isRed = true;
-    } else if ((*u).isRed == false && p == (*g).left && s == (*p).left) {
-        rotateRight(g);
-        (*p).isRed = false;
-        (*g).isRed = true;
-    } else if ((*u).isRed == false && p == (*g).right && s == (*p).right) {
-        rotateLeft(g);
-        (*p).isRed = false;
-        (*g).isRed = true;
-    } else if ((*u).isRed == false && p == (*g).left && s == (*p).right) {
-        (*g).isRed = true;
-        rotateLeft(p);
-        p = (*s).parent;
-        g = (*p).parent;
-        (*p).isRed = false;
-        (*g).isRed = true;
-    } else if ((*u).isRed == false && p == (*g).right && s == (*p).left) {
-        (*g).isRed = true;
-        rotateRight(p);
-    }
+    x = root;
+
+    while (x->parent != NULL && x->parent->color == RED) 
+        if (x->parent == NULL) x->color = BLACK;
+        if (x->parent != NULL) p = x->parent;
+        if (p->parent != NULL) g = p->parent;
+        if (g->left == p && g->right != NULL) u = g->right;
+            else u = g->left;
+            
+        //дядя красный
+        if (u != NULL && u->color == RED) {
+            g->color = RED;
+            p->color = BLACK;
+            u->color = BLACK;
+        } 
+        //дядя чёрный и линия справа
+        else if (u != NULL && u->color == BLACK && g->right == p && p->right == x) {
+            rotateLeft(g);
+            (*g).color = RED;
+            (*p).color = BLACK;
+        }
+        //дядя чёрный и линия слева
+        else if (u != NULL && u->color == BLACK && g->left == p && p->left == x) {
+            rotateRight(g);
+            (*g).color = RED;
+            (*p).color = BLACK;
+        }
+        //дядя чёрный и треугольник справа
+        else if (u != NULL && u->color == BLACK && g->right == p && p->left == x) {
+            rotateRight(p);
+        }
+        //дядя чёрный и треугольник слева
+        else if (u != NULL && u->color == BLACK && g->left == p && p->right == x) {
+            rotateLeft(p);
+        }
+    
+    //в случаях поворотах текущий узел - х, может находиться не там где был изначально,
+    //ищем настоящий корень
+    while (x->parent != NULL) x = x->parent;
+    x->color = BLACK;
+
+    return x;
 }

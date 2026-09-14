@@ -1,7 +1,5 @@
 #include <stdio.h>
-#include <cstring>
-
-using namespace std;
+#include <string.h>
 
 int rabinKarpSearch(char *text, char *str){
     unsigned int strLen = strlen(str); //длина подстроки
